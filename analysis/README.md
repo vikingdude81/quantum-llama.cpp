@@ -213,6 +213,63 @@ python analysis/examples/consciousness_scoring.py
 - State classification distribution
 - Interpretation and recommendations
 
+### 4. `capture_qrng_data.py`
+
+Parse `--quantum-verbose` output from llama-cli to extract entropy, EDT temperature,
+QRNG mode, and rarity metrics.
+
+```bash
+# From stdin (pipe llama-cli output)
+./build/bin/llama-cli -m model.gguf -p "prompt" -n 100 --quantum-verbose 2>&1 | \
+    python analysis/examples/capture_qrng_data.py
+
+# From file
+python analysis/examples/capture_qrng_data.py -f quantum_output.txt
+
+# Demo mode (synthetic data)
+python analysis/examples/capture_qrng_data.py --demo
+
+# Save analysis to JSON
+python analysis/examples/capture_qrng_data.py -f quantum_output.txt -o analysis.json
+```
+
+**Output:**
+- Sampling statistics (greedy vs QRNG ratio)
+- Entropy statistics (mean, std, range)
+- QRNG quality metrics (Hurst exponent, min-entropy)
+- Trajectory classification
+- Chaos metrics (Lyapunov exponent, criticality)
+
+### 5. `capture_server_data.py`
+
+Capture tokens and log probabilities from the llama.cpp HTTP server API.
+
+```bash
+# Start the server first
+./build/bin/llama-server -m model.gguf
+
+# Query server and analyze
+python analysis/examples/capture_server_data.py -p "Once upon a time" -n 100
+
+# Demo mode (no server required)
+python analysis/examples/capture_server_data.py --demo
+
+# Custom parameters
+python analysis/examples/capture_server_data.py \
+    --url http://localhost:8080 \
+    -p "Hello world" \
+    -n 50 \
+    --temperature 0.9 \
+    -o results.json
+```
+
+**Output:**
+- Token statistics (total, unique, ID range)
+- Probability statistics (top-1 prob, entropy)
+- Trajectory classification
+- Chaos metrics
+- Generated text preview
+
 ## Testing the Core Hypothesis
 
 This toolkit enables testing the fundamental hypothesis of quantum-llama.cpp:
